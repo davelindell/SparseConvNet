@@ -12,23 +12,23 @@ torch_dir = os.path.dirname(torch.__file__)
 
 print('Building SCN module')
 if torch.cuda.is_available():
-    r = os.system(
-        'cd sparseconvnet/SCN; nvcc init.cu -c -o init.cu.o -ccbin /usr/bin/cc'
-        + ' -m64 --std c++11 -Xcompiler '
-        + ',\"-fopenmp\",\"-fPIC\",\"-O3\",\"-DNDEBUG\" '
-        + '-gencode arch=compute_62,code=sm_62 '
-        + '-gencode arch=compute_61,code=sm_61 '
-        + '-gencode arch=compute_60,code=sm_60 '
-        + '-gencode arch=compute_52,code=sm_52 '
-        + '-gencode arch=compute_50,code=sm_50 '
-        + '-gencode arch=compute_30,code=sm_30 '
-        + '-DNVCC '
-        + '-I/usr/local/cuda/include '
-        + '-I' + torch_dir + '/lib/include '
-        + '-I' + torch_dir + '/lib/include/TH '
-        + '-I' + torch_dir + '/lib/include/THC '
-        + '-I.')
-    assert r == 0
+#    r = os.system(
+#        'cd sparseconvnet/SCN; nvcc init.cu -c -o init.cu.o -ccbin /usr/bin/gcc-5'
+#        + ' -m64 --std c++11 -Xcompiler '
+#        + ',\"-fopenmp\",\"-fPIC\",\"-O3\",\"-DNDEBUG\" '
+#        + '-gencode arch=compute_62,code=sm_62 '
+#        + '-gencode arch=compute_61,code=sm_61 '
+#        + '-gencode arch=compute_60,code=sm_60 '
+#        + '-gencode arch=compute_52,code=sm_52 '
+#        + '-gencode arch=compute_50,code=sm_50 '
+#        + '-gencode arch=compute_30,code=sm_30 '
+#        + '-DNVCC '
+#        + '-I/opt/cuda/include '
+#        + '-I' + torch_dir + '/lib/include '
+#        + '-I' + torch_dir + '/lib/include/TH '
+#        + '-I' + torch_dir + '/lib/include/THC '
+#        + '-I.')
+#    assert r == 0
     ffi = create_extension(
         'sparseconvnet.SCN',
         headers=[
@@ -39,10 +39,11 @@ if torch.cuda.is_available():
             this_dir +
             '/sparseconvnet/SCN/init.cu.o'],
         relative_to=__file__,
+        include_dirs=['/opt/cuda/include'],
         with_cuda=True)
 else:
     r = os.system(
-        'cd sparseconvnet/SCN; g++ -std=c++11 -fPIC -c init.cpp -o init.cpp.o -I' +
+        'cd sparseconvnet/SCN; g++-5 -std=c++11 -fPIC -c init.cpp -o init.cpp.o -I' +
         torch_dir +
         '/lib/include -I' +
         torch_dir +
